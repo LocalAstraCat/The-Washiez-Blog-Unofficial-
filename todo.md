@@ -26,5 +26,7 @@
 - [ ] Configure a Supabase project for authentication, database, and role-based security
 - [ ] Migrate the Chronicle’s live publishing features to a GitHub Pages-compatible Supabase architecture
 - [ ] Publish the static frontend through GitHub Pages and verify the deployed site
+- [ ] Fix the GitHub Pages workflow package-manager configuration conflict
+- [x] Fix the GitHub Pages workflow package-manager configuration conflict
 - [ ] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
 - [x] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
