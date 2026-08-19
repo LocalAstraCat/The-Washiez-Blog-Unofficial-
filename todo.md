@@ -49,5 +49,7 @@
 - [x] Simplify the visual hierarchy across public, writer, and owner screens while retaining the original Washiez colour palette
 - [x] Rewrite site navigation, headings, actions, form labels, status messages, and empty states in plain language
 - [ ] Verify the simplified desktop and mobile interface with visual review before publishing
-- [ ] Push the simplified redesign and writer autosave update to the selected GitHub Pages repository
-- [ ] Verify the completed GitHub Pages workflow and the live public site
+- [ ] Visually verify the simplified writer workspace on desktop and mobile
+- [ ] Visually verify the simplified admin console on desktop and mobile
+- [x] Push the simplified redesign and writer autosave update to the selected GitHub Pages repository
+- [x] Verify the completed GitHub Pages workflow and the live public site
