@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchPublishedPosts, useSupabaseQuery } from "@/lib/supabase";
 import { BookOpen, ChevronRight, FileText, Search, ShieldCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "wouter";
 
 export default function Home() {

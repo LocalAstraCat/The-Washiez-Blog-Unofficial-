@@ -15,3 +15,7 @@ The public GitHub Pages deployment was verified after commit `f137a24` completed
 - The public homepage now shows the simplified heading, navigation, and post discovery language at `https://localastracat.github.io/The-Washiez-Blog-Unofficial-/`.
 - The authenticated writer workspace now shows the plain-language draft editor and its visible local-save status.
 - The authenticated admin console now shows the simplified Admin, Users, Posts, and Comments controls.
+
+## GitHub Pages deep-link verification
+
+The GitHub Pages workflow for commit `8a77fc7` completed successfully. The direct URL `https://localastracat.github.io/The-Washiez-Blog-Unofficial-/about` was opened in a fresh navigation and rendered the site Guidelines page rather than GitHub Pages’ default 404 screen.
