@@ -1,0 +1,30 @@
+# Project TODO
+
+- [x] Define article lifecycle, site roles, and moderation permissions
+- [x] Add database schema and migrations for posts, tags, writer applications, comments, and votes
+- [x] Implement secure article, taxonomy, application, comment, vote, and moderation procedures
+- [x] Expose published tag metadata for public discovery filters and navigation
+- [x] Build a polished public homepage with newest-first article discovery, filtering, and search
+- [x] Build public article pages with Markdown rendering, metadata, tags, comments, and voting
+- [x] Build gated writer application, editorial dashboard, draft management, and Markdown editor flows
+- [x] Let rejected writer applicants submit a revised application
+- [x] Keep published articles out of draft deletion controls in the writer workspace
+- [x] Let rejected writer applicants submit a revised application
+- [x] Keep published articles out of draft deletion controls in the writer workspace
+- [x] Complete the protected workspace and admin routes linked from the public header
+- [x] Build the owner admin panel for role promotion and post moderation
+- [x] Add error, loading, empty, and permission-denied states across all core flows
+- [x] Add explicit retryable query-error states across public, writer, and moderation screens
+- [x] Add explicit retryable query-error states across public, writer, and moderation screens
+- [x] Add and run Vitest coverage for permissions and publishing logic
+- [x] Verify desktop and mobile presentation, then create a final project checkpoint
+- [x] Review Washiez brand references and document an accurate visual palette
+- [x] Keep the redesign original and use the official site only for approved information and color cues
+- [x] Redesign public, writer, and owner pages with Washiez car-wash color cues and graphic energy
+- [ ] Prepare the selected GitHub repository with a documented GitHub Pages hybrid deployment path
+- [x] Verify the rebranded desktop and mobile presentation before saving an updated checkpoint
+- [ ] Configure a Supabase project for authentication, database, and role-based security
+- [ ] Migrate the Chronicle’s live publishing features to a GitHub Pages-compatible Supabase architecture
+- [ ] Publish the static frontend through GitHub Pages and verify the deployed site
+- [ ] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
+- [x] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
