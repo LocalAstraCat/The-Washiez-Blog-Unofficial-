@@ -2,7 +2,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc";
+import { fetchPublishedPosts, useSupabaseQuery } from "@/lib/supabase";
 import { BookOpen, ChevronRight, FileText, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -11,9 +11,10 @@ export default function Home() {
   const [category, setCategory] = useState<string | undefined>();
   const [tag, setTag] = useState<string | undefined>();
   const filters = useMemo(() => ({ search: search || undefined, category, tag }), [search, category, tag]);
-  const { data: posts, isLoading, error: postsError, refetch: refetchPosts } = trpc.posts.list.useQuery(filters);
-  const { data: categories, error: categoriesError } = trpc.posts.categories.useQuery();
-  const { data: tags, error: tagsError } = trpc.posts.tags.useQuery();
+  const archive = useSupabaseQuery(() => fetchPublishedPosts(filters), [filters]);
+  const posts = archive.data;
+  const categories = useMemo(() => Array.from(new Set(posts?.map((post) => post.category) ?? [])).sort(), [posts]);
+  const tags = useMemo(() => Array.from(new Set(posts?.flatMap((post) => post.tags) ?? [])).sort().map((name) => ({ name, slug: name })), [posts]);
   const clearFilters = () => { setSearch(""); setCategory(undefined); setTag(undefined); };
 
   return <div className="site-frame">
@@ -26,8 +27,8 @@ export default function Home() {
       <section className="archive-section" id="archive">
         <header className="archive-header"><div><span className="section-kicker"><FileText size={15} /> Latest entries</span><h2>The archive</h2></div><p>{posts?.length ?? 0} published {posts?.length === 1 ? "entry" : "entries"}</p></header>
         <div className="archive-layout">
-          <aside className="filter-panel"><div className="search-field"><Search size={17} /><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search the archive" aria-label="Search articles" /></div><div className="filter-group"><span>Browse by category</span><div className="filter-list"><button className={!category ? "active" : ""} onClick={() => setCategory(undefined)}>All categories</button>{categories?.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item}</button>)}</div></div><div className="filter-group"><span>Topics</span><div className="topic-list">{tags?.map((item) => <button key={item.slug} className={tag === item.slug ? "active" : ""} onClick={() => setTag(tag === item.slug ? undefined : item.slug)}>{item.name}</button>)}</div></div>{(categoriesError || tagsError) && <p className="query-error">Some archive filters are temporarily unavailable. Refresh the page to retry.</p>}{(search || category || tag) && <Button variant="ghost" className="reset-filter" onClick={clearFilters}>Clear filters</Button>}</aside>
-          <div className="article-list">{isLoading && <p className="muted-copy">Loading the archive…</p>}{postsError && <div className="query-error query-error--card"><strong>The archive could not be loaded.</strong><span>Please retry the request. Your filters have been kept in place.</span><Button variant="outline" size="sm" onClick={() => void refetchPosts()}>Retry archive</Button></div>}{!isLoading && !postsError && !posts?.length && <div className="empty-state"><h3>No published entries match this view.</h3><p>Try widening your search or clearing a filter. New articles will appear here once an approved writer publishes them.</p><Button variant="outline" onClick={clearFilters}>Reset archive view</Button></div>}{posts?.map((post, index) => <ArticleCard key={post.id} post={post} feature={index === 0} />)}</div>
+          <aside className="filter-panel"><div className="search-field"><Search size={17} /><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search the archive" aria-label="Search articles" /></div><div className="filter-group"><span>Browse by category</span><div className="filter-list"><button className={!category ? "active" : ""} onClick={() => setCategory(undefined)}>All categories</button>{categories.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item}</button>)}</div></div><div className="filter-group"><span>Topics</span><div className="topic-list">{tags.map((item) => <button key={item.slug} className={tag === item.slug ? "active" : ""} onClick={() => setTag(tag === item.slug ? undefined : item.slug)}>{item.name}</button>)}</div></div>{archive.error && <p className="query-error">Some archive filters are temporarily unavailable. Retry the archive request to continue.</p>}{(search || category || tag) && <Button variant="ghost" className="reset-filter" onClick={clearFilters}>Clear filters</Button>}</aside>
+          <div className="article-list">{archive.isLoading && <p className="muted-copy">Loading the archive…</p>}{archive.error && <div className="query-error query-error--card"><strong>The archive could not be loaded.</strong><span>Please retry the request. Your filters have been kept in place.</span><Button variant="outline" size="sm" onClick={() => void archive.refetch()}>Retry archive</Button></div>}{!archive.isLoading && !archive.error && !posts?.length && <div className="empty-state"><h3>No published entries match this view.</h3><p>Try widening your search or clearing a filter. New articles will appear here once an approved writer publishes them.</p><Button variant="outline" onClick={clearFilters}>Reset archive view</Button></div>}{posts?.map((post, index) => <ArticleCard key={post.id} post={post} feature={index === 0} />)}</div>
         </div>
       </section>
     </main>
