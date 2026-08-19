@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, Clock3 } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Clock3, Pin } from "lucide-react";
 import { Link } from "wouter";
 
 type ArticleCardProps = {
@@ -11,6 +11,7 @@ type ArticleCardProps = {
     authorName: string | null;
     publishedAt: Date | string | null;
     createdAt: Date | string;
+    isPinned?: boolean;
   };
   feature?: boolean;
 };
@@ -22,7 +23,7 @@ function formatDate(value: Date | string | null) {
 export function ArticleCard({ post, feature = false }: ArticleCardProps) {
   return (
     <article className={`article-card ${feature ? "article-card--feature" : ""}`}>
-      <div className="article-card__eyebrow"><span>{post.category}</span><span className="eyebrow-rule" /><time dateTime={String(post.publishedAt ?? post.createdAt)}><CalendarDays size={13} />{formatDate(post.publishedAt ?? post.createdAt)}</time></div>
+      <div className="article-card__eyebrow">{post.isPinned && <span className="pinned-label"><Pin size={12} /> Pinned</span>}<span>{post.category}</span><span className="eyebrow-rule" /><time dateTime={String(post.publishedAt ?? post.createdAt)}><CalendarDays size={13} />{formatDate(post.publishedAt ?? post.createdAt)}</time></div>
       <h2><Link href={`/article/${post.slug}`}>{post.title}</Link></h2>
       <p className="article-card__excerpt">{post.excerpt}</p>
       <div className="article-card__footer">

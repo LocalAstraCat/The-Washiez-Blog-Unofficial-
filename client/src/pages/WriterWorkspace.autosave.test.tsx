@@ -79,4 +79,11 @@ describe("WriterWorkspace autosave", () => {
     expect(screen.getByText("Saved on this device")).toBeTruthy();
     expect(window.localStorage.getItem("washiez-chronicle:draft:writer-1:new")).toContain("A clear Washiez update");
   });
+
+  it("shows a concise Markdown reference beside the editor fields", () => {
+    render(<WriterWorkspace />);
+    expect(screen.getByText("Markdown quick help")).toBeTruthy();
+    expect(screen.getByText("**important**")).toBeTruthy();
+    expect(screen.getByText("[Name](https://example.com)")).toBeTruthy();
+  });
 });

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
+import { withPinnedPostFirst } from "./pinning";
 import { isValidUsername, nativeAccountEmail, normalizeUsername } from "./username";
 
 export { isValidUsername } from "./username";
@@ -67,6 +68,7 @@ export type ChroniclePost = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
+  isPinned: boolean;
 };
 
 type PostRow = {
@@ -82,7 +84,7 @@ export function toChroniclePost(row: PostRow): ChroniclePost {
     id: row.id, slug: row.slug, title: row.title, body: row.body, excerpt: excerpt ? `${excerpt}${row.body.length > excerpt.length ? "…" : ""}` : "",
     coverImageUrl: row.cover_image_url, category: row.category, tags: row.tags ?? [], status: row.status,
     authorId: row.author_id, authorName: profile?.display_name ?? null, createdAt: row.created_at,
-    updatedAt: row.updated_at, publishedAt: row.published_at,
+    updatedAt: row.updated_at, publishedAt: row.published_at, isPinned: false,
   };
 }
 
@@ -110,9 +112,9 @@ export async function fetchPublishedPosts(filters: { search?: string; category?:
   if (filters.category) query = query.eq("category", filters.category);
   if (filters.tag) query = query.contains("tags", [filters.tag]);
   if (filters.search) query = query.or(`title.ilike.%${filters.search}%,body.ilike.%${filters.search}%`);
-  const { data, error } = await query;
+  const [pinnedPostId, { data, error }] = await Promise.all([fetchPinnedPostId(), query]);
   if (error) throw error;
-  return ((data ?? []) as PostRow[]).map(toChroniclePost);
+  return withPinnedPostFirst(((data ?? []) as PostRow[]).map(toChroniclePost), pinnedPostId);
 }
 
 export async function fetchPublishedPost(slug: string) {
@@ -122,6 +124,12 @@ export async function fetchPublishedPost(slug: string) {
     .eq("slug", slug).eq("status", "published").maybeSingle();
   if (error) throw error;
   return data ? toChroniclePost(data as PostRow) : null;
+}
+
+export async function fetchPinnedPostId() {
+  const { data, error } = await supabase.from("site_settings").select("pinned_post_id").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  return (data?.pinned_post_id as string | null | undefined) ?? null;
 }
 
 export type ChronicleComment = { id: string; body: string; createdAt: string; authorName: string | null };
@@ -255,9 +263,17 @@ export async function setProfileRole(id: string, role: AdminProfile["role"]) {
 }
 
 export async function fetchAdminPosts() {
-  const { data, error } = await supabase.from("posts").select("id,slug,title,body,cover_image_url,category,tags,status,author_id,created_at,updated_at,published_at,profiles!posts_author_id_fkey(display_name)").order("updated_at", { ascending: false });
+  const [pinnedPostId, { data, error }] = await Promise.all([
+    fetchPinnedPostId(),
+    supabase.from("posts").select("id,slug,title,body,cover_image_url,category,tags,status,author_id,created_at,updated_at,published_at,profiles!posts_author_id_fkey(display_name)").order("updated_at", { ascending: false }),
+  ]);
   if (error) throw error;
-  return ((data ?? []) as PostRow[]).map(toChroniclePost);
+  return withPinnedPostFirst(((data ?? []) as PostRow[]).map(toChroniclePost), pinnedPostId);
+}
+
+export async function setPinnedPost(id: string | null) {
+  const { error } = await supabase.rpc("set_pinned_post", { target_post_id: id });
+  if (error) throw error;
 }
 
 export async function moderatePost(id: string, action: "unpublish" | "delete") {

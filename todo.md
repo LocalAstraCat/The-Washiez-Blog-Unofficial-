@@ -62,3 +62,11 @@
 - [ ] Verify the live Apply to write button while signed out routes users to the sign-in and application path
 - [ ] Verify the live Apply to write button with a non-writer account shows the writer application form
 - [x] Add automated coverage confirming signed-out visitors receive sign-in guidance and non-writer accounts receive the application form
+- [x] Add a concise Markdown formatting reference inside the writer editor
+- [x] Add an admin-only control for pinning one published post and clearing the existing pin
+- [x] Persist the single pinned-post state in Supabase with policies that prevent non-admin changes
+- [x] Display the pinned published post first in the public archive with a clear pinned label
+- [x] Add tests for single-pin behavior, permissions, archive ordering, and Markdown reference visibility
+- [x] Add automated coverage proving non-admins cannot see or use the pin controls
+- [x] Add an integration check confirming the Supabase pinning RPC rejects non-admin callers
+- [ ] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
