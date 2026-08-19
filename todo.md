@@ -70,3 +70,5 @@
 - [x] Add automated coverage proving non-admins cannot see or use the pin controls
 - [x] Add an integration check confirming the Supabase pinning RPC rejects non-admin callers
 - [x] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
+- [ ] Fix the admin Posts Delete action so its label remains visible and readable without text selection
+- [ ] Verify the live Delete action remains readable alongside Pin and Unpublish controls
