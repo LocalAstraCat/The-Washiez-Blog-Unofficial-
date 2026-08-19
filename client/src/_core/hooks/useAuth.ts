@@ -5,6 +5,8 @@ type ChronicleUser = {
   id: string;
   name: string | null;
   email: string | null;
+  pendingEmail: string | null;
+  emailVerified: boolean;
   role: "user" | "writer" | "admin";
 };
 
@@ -21,7 +23,17 @@ export function useAuth() {
     const { data: profile, error: profileError } = await supabase
       .from("profiles").select("display_name,role").eq("id", session.user.id).maybeSingle();
     if (profileError) { setError(profileError); }
-    setUser({ id: session.user.id, name: profile?.display_name ?? session.user.user_metadata.full_name ?? session.user.email ?? null, email: session.user.email ?? null, role: profile?.role ?? "user" });
+    const sessionEmail = session.user.email ?? null;
+    const nativeAddress = sessionEmail?.endsWith("@members.washiez.local") ?? false;
+    const pendingEmail = typeof session.user.user_metadata.pending_email === "string" ? session.user.user_metadata.pending_email : null;
+    setUser({
+      id: session.user.id,
+      name: profile?.display_name ?? session.user.user_metadata.username ?? sessionEmail ?? null,
+      email: nativeAddress ? null : sessionEmail,
+      pendingEmail,
+      emailVerified: Boolean(sessionEmail && !nativeAddress),
+      role: profile?.role ?? "user",
+    });
     setLoading(false);
   }, []);
 

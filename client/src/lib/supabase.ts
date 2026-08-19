@@ -1,5 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
+import { isValidUsername, nativeAccountEmail, normalizeUsername } from "./username";
+
+export { isValidUsername } from "./username";
 
 const projectUrl = import.meta.env.VITE_SUPABASE_URL;
 const publishableKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -11,6 +14,38 @@ if (!projectUrl || !publishableKey) {
 export const supabase = createClient(projectUrl, publishableKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 });
+
+const nativeRedirectUrl = `${window.location.origin}${import.meta.env.BASE_URL}`;
+
+export async function signUpWithUsername({ username, password, email }: { username: string; password: string; email?: string }) {
+  const canonicalUsername = normalizeUsername(username);
+  if (!isValidUsername(canonicalUsername)) throw new Error("Choose a username with 3–24 letters, numbers, underscores, or hyphens.");
+  if (password.length < 8) throw new Error("Choose a password with at least 8 characters.");
+  const pendingEmail = email?.trim().toLowerCase() || undefined;
+  const { data, error } = await supabase.auth.signUp({
+    email: nativeAccountEmail(canonicalUsername), password,
+    options: { data: { username: canonicalUsername, pending_email: pendingEmail }, emailRedirectTo: nativeRedirectUrl },
+  });
+  if (error) throw error;
+  if (pendingEmail && data.user) {
+    const { error: verificationError } = await supabase.auth.updateUser({ email: pendingEmail }, { emailRedirectTo: nativeRedirectUrl });
+    if (verificationError) throw verificationError;
+  }
+  return { verificationSent: Boolean(pendingEmail) };
+}
+
+export async function signInWithIdentifier(identifier: string, password: string) {
+  const normalized = identifier.trim().toLowerCase();
+  if (!normalized || !password) throw new Error("Enter your username or verified email and password.");
+  const email = normalized.includes("@") ? normalized : nativeAccountEmail(normalized);
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
+export async function resendOptionalEmailVerification(pendingEmail: string) {
+  const { error } = await supabase.auth.resend({ type: "email_change", email: pendingEmail, options: { emailRedirectTo: nativeRedirectUrl } });
+  if (error) throw error;
+}
 
 type ProfileJoin = { display_name: string | null } | { display_name: string | null }[] | null;
 

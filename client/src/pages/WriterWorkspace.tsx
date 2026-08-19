@@ -3,11 +3,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { startLogin } from "@/const";
 import { ChroniclePost, createDraft, deleteDraft, fetchMyApplication, fetchMyPosts, PostInput, publishDraft, submitWriterApplication, updateDraft, useSupabaseQuery } from "@/lib/supabase";
 import { CheckCircle2, Eye, FilePlus2, FileText, LogIn, PencilLine, Send, ShieldAlert, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Streamdown } from "streamdown";
+import { useLocation } from "wouter";
 
 const blankForm = { title: "", body: "", coverImageUrl: "", category: "History", tags: "" };
 
@@ -17,6 +17,7 @@ function WorkspaceMessage({ title, copy, action, onAction, icon }: { title: stri
 
 function ApplicationGate() {
   const { isAuthenticated, loading } = useAuth();
+  const [, setLocation] = useLocation();
   const [motivation, setMotivation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -28,7 +29,7 @@ function ApplicationGate() {
     finally { setIsSubmitting(false); }
   };
   if (loading) return <WorkspaceMessage title="Checking your access" copy="Loading your Chronicle account…" />;
-  if (!isAuthenticated) return <WorkspaceMessage title="Writing tools are for approved contributors" copy="Sign in with your Chronicle account to apply for writer access or manage an approved workspace." action="Sign in to continue" onAction={() => void startLogin()} icon={<LogIn size={22} />} />;
+  if (!isAuthenticated) return <WorkspaceMessage title="Writing tools are for approved contributors" copy="Sign in with your Chronicle account from the archive, then return here to apply for writer access or manage an approved workspace." action="Return to archive" onAction={() => setLocation("/")} icon={<LogIn size={22} />} />;
   if (application.isLoading) return <WorkspaceMessage title="Checking your application" copy="Loading your contributor status…" />;
   if (application.error) return <WorkspaceMessage title="Contributor status unavailable" copy="Your account could not be checked right now. Retry the status check before submitting an application." action="Retry access check" onAction={() => void application.refetch()} icon={<ShieldAlert size={22} />} />;
   if (application.data?.status === "pending") return <WorkspaceMessage title="Application under review" copy="Your writer application is awaiting an owner decision. You will gain access to drafting tools once it has been approved." icon={<FileText size={22} />} />;

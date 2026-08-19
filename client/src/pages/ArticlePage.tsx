@@ -2,11 +2,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { castVote, createComment, fetchComments, fetchPublishedPost, fetchVoteSummary, useSupabaseQuery } from "@/lib/supabase";
-import { startLogin } from "@/const";
 import { ArrowBigDown, ArrowBigUp, ArrowLeft, CalendarDays, MessageSquare, Send } from "lucide-react";
 import { useState } from "react";
 import { Streamdown } from "streamdown";
-import { Link, useRoute } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 
 function readableDate(value: Date | string | null) {
   return new Date(value ?? Date.now()).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
@@ -14,10 +13,11 @@ function readableDate(value: Date | string | null) {
 
 function VoteBox({ postId }: { postId: string }) {
   const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const summary = useSupabaseQuery(() => fetchVoteSummary(postId), [postId]);
   const [isVoting, setIsVoting] = useState(false);
   const cast = async (value: 1 | -1) => {
-    if (!isAuthenticated) { void startLogin(); return; }
+    if (!isAuthenticated) { setLocation("/"); return; }
     setIsVoting(true);
     try { await castVote(postId, value); await summary.refetch(); } finally { setIsVoting(false); }
   };
@@ -26,6 +26,7 @@ function VoteBox({ postId }: { postId: string }) {
 
 function Discussion({ postId }: { postId: string }) {
   const { isAuthenticated, user } = useAuth();
+  const [, setLocation] = useLocation();
   const [body, setBody] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string>();
@@ -36,7 +37,7 @@ function Discussion({ postId }: { postId: string }) {
     catch (error) { setPostError(error instanceof Error ? error.message : "Your note could not be posted."); }
     finally { setIsPosting(false); }
   };
-  return <section className="discussion" id="discussion"><div className="section-kicker"><MessageSquare size={15} /> Discussion</div><h2>Reader notes</h2><p className="discussion__intro">Keep replies relevant, cite sources where possible, and distinguish documented information from personal interpretation.</p>{isAuthenticated ? <div className="comment-form"><Textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder={`Add a thoughtful note as ${user?.name ?? "a reader"}…`} /><Button disabled={body.trim().length < 2 || isPosting} onClick={() => void submit()}><Send size={15} /> {isPosting ? "Posting…" : "Post note"}</Button>{postError && <p className="form-error">{postError}</p>}</div> : <div className="login-prompt"><p>Sign in to join the discussion or vote on this article.</p><Button variant="outline" onClick={() => void startLogin()}>Sign in to comment</Button></div>}<div className="comment-list">{comments.isLoading && <p className="muted-copy">Loading discussion…</p>}{comments.error && <div className="query-error"><span>Reader notes could not be loaded.</span><Button size="sm" variant="outline" onClick={() => void comments.refetch()}>Retry</Button></div>}{!comments.isLoading && !comments.error && !comments.data?.length && <p className="muted-copy">No reader notes yet. Be the first to contribute a considered response.</p>}{comments.data?.map((comment) => <article className="comment" key={comment.id}><div className="comment__avatar">{(comment.authorName || "R").slice(0, 1).toUpperCase()}</div><div><header><strong>{comment.authorName || "Reader"}</strong><time>{readableDate(comment.createdAt)}</time></header><p>{comment.body}</p></div></article>)}</div></section>;
+  return <section className="discussion" id="discussion"><div className="section-kicker"><MessageSquare size={15} /> Discussion</div><h2>Reader notes</h2><p className="discussion__intro">Keep replies relevant, cite sources where possible, and distinguish documented information from personal interpretation.</p>{isAuthenticated ? <div className="comment-form"><Textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder={`Add a thoughtful note as ${user?.name ?? "a reader"}…`} /><Button disabled={body.trim().length < 2 || isPosting} onClick={() => void submit()}><Send size={15} /> {isPosting ? "Posting…" : "Post note"}</Button>{postError && <p className="form-error">{postError}</p>}</div> : <div className="login-prompt"><p>Sign in from the archive to join the discussion or vote on this article.</p><Button variant="outline" onClick={() => setLocation("/")}>Return to archive</Button></div>}<div className="comment-list">{comments.isLoading && <p className="muted-copy">Loading discussion…</p>}{comments.error && <div className="query-error"><span>Reader notes could not be loaded.</span><Button size="sm" variant="outline" onClick={() => void comments.refetch()}>Retry</Button></div>}{!comments.isLoading && !comments.error && !comments.data?.length && <p className="muted-copy">No reader notes yet. Be the first to contribute a considered response.</p>}{comments.data?.map((comment) => <article className="comment" key={comment.id}><div className="comment__avatar">{(comment.authorName || "R").slice(0, 1).toUpperCase()}</div><div><header><strong>{comment.authorName || "Reader"}</strong><time>{readableDate(comment.createdAt)}</time></header><p>{comment.body}</p></div></article>)}</div></section>;
 }
 
 export default function ArticlePage() {

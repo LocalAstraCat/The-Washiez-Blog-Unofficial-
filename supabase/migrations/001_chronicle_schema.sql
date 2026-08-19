@@ -3,7 +3,7 @@
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  display_name text,
+  display_name text not null unique check (display_name ~ '^[A-Za-z0-9_-]{3,24}$'),
   role text not null default 'user' check (role in ('user', 'writer', 'admin')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -89,7 +89,7 @@ set search_path = public
 as $$
 begin
   insert into public.profiles (id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name', new.email));
+  values (new.id, coalesce(new.raw_user_meta_data ->> 'username', split_part(new.email, '@', 1)));
   return new;
 end;
 $$;
