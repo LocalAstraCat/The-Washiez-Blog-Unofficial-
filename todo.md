@@ -59,3 +59,6 @@
 - [x] Add a router-level regression test that verifies the Guidelines link retains the GitHub Pages repository base path
 - [x] Add a prominent public Apply to write button that links members to the existing writer application page
 - [ ] Test and verify the public Apply to write entry point on GitHub Pages
+- [ ] Verify the live Apply to write button while signed out routes users to the sign-in and application path
+- [ ] Verify the live Apply to write button with a non-writer account shows the writer application form
+- [x] Add automated coverage confirming signed-out visitors receive sign-in guidance and non-writer accounts receive the application form

@@ -19,3 +19,7 @@ The public GitHub Pages deployment was verified after commit `f137a24` completed
 ## GitHub Pages deep-link verification
 
 The GitHub Pages workflow for commit `8a77fc7` completed successfully. The direct URL `https://localastracat.github.io/The-Washiez-Blog-Unofficial-/about` was opened in a fresh navigation and rendered the site Guidelines page rather than GitHub Pages’ default 404 screen.
+
+## Public writer application entry point
+
+The public homepage was verified after the GitHub Pages workflow for commit `eb5a845` completed successfully. It now displays an **Apply to write** call-to-action. The link routes to `/The-Washiez-Blog-Unofficial-/workspace`; approved writers reach their desk there, while other signed-in accounts receive the existing writer-application screen.
