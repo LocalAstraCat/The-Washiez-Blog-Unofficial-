@@ -98,5 +98,5 @@
 - [x] Add realtime room delivery, protected navigation, and a responsive staff-chat interface
 - [x] Add Vitest coverage for chat access control, retention eligibility, mentions, search, and pinning
 - [x] Make Enter send staff-chat messages while Shift+Enter continues to add a new line
-- [ ] Apply the chat migration, verify the live permissions, and publish the GitHub Pages update
-- [ ] Deliver the staff-chat feature through GitHub Pages only, without creating a Manus checkpoint or publishing the Manus site
+- [x] Apply the chat migration, verify the live permissions, and publish the GitHub Pages update
+- [x] Deliver the staff-chat feature through GitHub Pages only, without creating a Manus checkpoint or publishing the Manus site
