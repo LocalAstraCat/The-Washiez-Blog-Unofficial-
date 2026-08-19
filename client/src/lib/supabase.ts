@@ -27,13 +27,7 @@ export async function signUpWithUsername({ username, password, email }: { userna
     options: { data: { username: canonicalUsername, pending_email: pendingEmail }, emailRedirectTo: nativeRedirectUrl },
   });
   if (error) throw error;
-  if (pendingEmail && data.user) {
-    if (!data.session) {
-      await signInWithIdentifier(canonicalUsername, password);
-    }
-    await requestOptionalEmailVerification(pendingEmail);
-  }
-  return { verificationSent: Boolean(pendingEmail) };
+  return { verificationPending: Boolean(pendingEmail) };
 }
 
 export async function signInWithIdentifier(identifier: string, password: string) {

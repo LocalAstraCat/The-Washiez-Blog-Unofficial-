@@ -25,15 +25,17 @@
 - [x] Verify the rebranded desktop and mobile presentation before saving an updated checkpoint
 - [x] Configure a Supabase project for authentication, database, and role-based security
 - [ ] Migrate the Chronicle’s live publishing features to a GitHub Pages-compatible Supabase architecture
-- [ ] Publish the static frontend through GitHub Pages and verify the deployed site
-- [ ] Apply the checked-in Supabase schema and activate production native account profiles before live publishing features can operate
+- [x] Publish the static frontend through GitHub Pages and verify the deployed site
+- [x] Apply the checked-in Supabase schema and activate production native account profiles before live publishing features can operate
 - [ ] Replace GitHub OAuth with native username/password accounts and optional email verification
-- [ ] Add a public sign-up and sign-in interface with username, password, and optional recommended email
+- [x] Add a public sign-up and sign-in interface with username, password, and optional recommended email
 - [ ] Support verification status and resend verification emails for accounts with an email address
-- [ ] Verify deployed native username/password sign-in and protected account flows end to end
+- [x] Verify deployed native username/password sign-in and protected account flows end to end
 - [ ] Verify optional email confirmation and resend behavior end to end
-- [ ] Complete a production Pages build and deployment after native account changes
+- [x] Complete a production Pages build and deployment after native account changes
 - [ ] Diagnose and fix missing optional email verification delivery for native accounts
+- [ ] Replace the unreliable default Supabase mailer with a configured SMTP provider before enabling production email verification
+- [ ] Mark optional email verification complete in the account UI only after SMTP delivery and confirmation are proven live
 - [ ] Fix the GitHub Pages workflow package-manager configuration conflict
 - [x] Fix the GitHub Pages workflow package-manager configuration conflict
 - [ ] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
