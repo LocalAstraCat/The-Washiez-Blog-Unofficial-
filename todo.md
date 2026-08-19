@@ -57,3 +57,5 @@
 - [x] Add regression coverage for repository-base-path internal navigation and verify the live Guidelines page
 - [x] Add a GitHub Pages 404.html single-page-app fallback so direct /about and other client routes load instead of showing a GitHub 404
 - [x] Add a router-level regression test that verifies the Guidelines link retains the GitHub Pages repository base path
+- [x] Add a prominent public Apply to write button that links members to the existing writer application page
+- [ ] Test and verify the public Apply to write entry point on GitHub Pages

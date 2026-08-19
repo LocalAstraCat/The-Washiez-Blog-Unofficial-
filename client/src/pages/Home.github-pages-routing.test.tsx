@@ -14,7 +14,7 @@ vi.mock("@/lib/supabase", () => ({ fetchPublishedPosts: vi.fn(), useSupabaseQuer
 describe("Home GitHub Pages navigation", () => {
   afterEach(() => window.history.replaceState({}, "", "/"));
 
-  it("keeps the repository prefix when the Guidelines link is clicked", () => {
+  it("keeps the repository prefix when public internal links are clicked", () => {
     window.history.replaceState({}, "", "/The-Washiez-Blog-Unofficial-/");
     render(<Router base="/The-Washiez-Blog-Unofficial-"><Home /></Router>);
 
@@ -22,5 +22,11 @@ describe("Home GitHub Pages navigation", () => {
     expect(guidelines.getAttribute("href")).toBe("/The-Washiez-Blog-Unofficial-/about");
     fireEvent.click(guidelines);
     expect(window.location.pathname).toBe("/The-Washiez-Blog-Unofficial-/about");
+
+    window.history.replaceState({}, "", "/The-Washiez-Blog-Unofficial-/");
+    const apply = screen.getByText("Apply to write");
+    expect(apply.getAttribute("href")).toBe("/The-Washiez-Blog-Unofficial-/workspace");
+    fireEvent.click(apply);
+    expect(window.location.pathname).toBe("/The-Washiez-Blog-Unofficial-/workspace");
   });
 });
