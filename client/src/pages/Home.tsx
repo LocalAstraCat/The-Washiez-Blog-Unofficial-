@@ -1,5 +1,6 @@
 import { ArticleCard } from "@/components/ArticleCard";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Seo } from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchPublishedPosts, useSupabaseQuery } from "@/lib/supabase";
@@ -18,7 +19,7 @@ export default function Home() {
   const tags = useMemo(() => Array.from(new Set(posts?.flatMap((post) => post.tags) ?? [])).sort().map((name) => ({ name, slug: name })), [posts]);
   const clearFilters = () => { setSearch(""); setCategory(undefined); setTag(undefined); };
 
-  return <div className="site-frame">
+  return <div className="site-frame"><Seo />
     <SiteHeader />
     <main>
       <section className="hero">

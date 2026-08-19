@@ -76,3 +76,8 @@
 - [ ] Add an owner-only Markdown feedback editor to the admin Posts moderation controls
 - [ ] Show Markdown-rendered owner feedback to the relevant author in the writer desk
 - [ ] Add access-control and rendering tests for private unpublished-post feedback
+- [ ] Add GitHub Pages crawler guidance through robots.txt with the public sitemap location
+- [ ] Generate a sitemap containing the public archive, Guidelines page, and published article URLs
+- [ ] Add canonical, description, Open Graph, Twitter, and publication structured-data metadata for public routes
+- [ ] Add regression coverage for generated SEO files and client-side public route metadata
+- [ ] Verify the published robots.txt, sitemap.xml, and homepage metadata on GitHub Pages
