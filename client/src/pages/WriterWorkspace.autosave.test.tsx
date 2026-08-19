@@ -3,12 +3,13 @@ import React from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AUTOSAVE_DELAY_MS } from "@/lib/draftRecovery";
-import WriterWorkspace from "./WriterWorkspace";
+import WriterWorkspace, { OwnerFeedbackNotice } from "./WriterWorkspace";
 
 const mocks = vi.hoisted(() => ({
   createDraft: vi.fn(),
   deleteDraft: vi.fn(),
   fetchMyApplication: vi.fn(),
+  fetchMyOwnerFeedback: vi.fn(),
   fetchMyPosts: vi.fn(),
   publishDraft: vi.fn(),
   submitWriterApplication: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock("@/lib/supabase", () => ({
   createDraft: mocks.createDraft,
   deleteDraft: mocks.deleteDraft,
   fetchMyApplication: mocks.fetchMyApplication,
+  fetchMyOwnerFeedback: mocks.fetchMyOwnerFeedback,
   fetchMyPosts: mocks.fetchMyPosts,
   publishDraft: mocks.publishDraft,
   submitWriterApplication: mocks.submitWriterApplication,
@@ -85,5 +87,13 @@ describe("WriterWorkspace autosave", () => {
     expect(screen.getByText("Markdown quick help")).toBeTruthy();
     expect(screen.getByText("**important**")).toBeTruthy();
     expect(screen.getByText("[Name](https://example.com)")).toBeTruthy();
+  });
+
+  it("renders an owner note as private Markdown feedback for the author", () => {
+    render(<OwnerFeedbackNotice body={"## Needed changes\n\n**Please add a source.**"} />);
+    expect(screen.getByText("Private owner note")).toBeTruthy();
+    expect(screen.getByText(/Only you and the site owner can see this feedback/i)).toBeTruthy();
+    expect(document.querySelector(".owner-feedback-notice .article-prose")?.textContent).toContain("## Needed changes");
+    expect(document.querySelector(".owner-feedback-notice .article-prose")?.textContent).toContain("**Please add a source.**");
   });
 });

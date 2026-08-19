@@ -72,3 +72,7 @@
 - [x] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
 - [x] Fix the admin Posts Delete action so its label remains visible and readable without text selection
 - [x] Verify the live Delete action remains readable alongside Pin and Unpublish controls
+- [ ] Add secure private owner feedback for unpublished posts, visible only to the post author and admins
+- [ ] Add an owner-only Markdown feedback editor to the admin Posts moderation controls
+- [ ] Show Markdown-rendered owner feedback to the relevant author in the writer desk
+- [ ] Add access-control and rendering tests for private unpublished-post feedback

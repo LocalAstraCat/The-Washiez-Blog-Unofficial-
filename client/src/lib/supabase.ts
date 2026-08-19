@@ -169,6 +169,7 @@ export async function castVote(postId: string, value: 1 | -1) {
 
 export type WriterApplication = { id: string; status: "pending" | "approved" | "rejected"; motivation: string; createdAt: string };
 export type PostInput = { title: string; body: string; coverImageUrl: string | null; category: string; tags: string[] };
+export type OwnerPostFeedback = { id: string; postId: string; body: string; updatedAt: string };
 
 async function currentUserId() {
   const { data: { user } } = await supabase.auth.getUser();
@@ -197,6 +198,18 @@ export async function fetchMyPosts() {
     .eq("author_id", userId).order("updated_at", { ascending: false });
   if (error) throw error;
   return ((data ?? []) as PostRow[]).map(toChroniclePost);
+}
+
+export async function fetchMyOwnerFeedback() {
+  const userId = await currentUserId();
+  const { data, error } = await supabase
+    .from("owner_post_feedback")
+    .select("id,post_id,body,updated_at,posts!inner(status)")
+    .eq("author_id", userId)
+    .eq("posts.status", "unpublished")
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row: { id: string; post_id: string; body: string; updated_at: string }) => ({ id: row.id, postId: row.post_id, body: row.body, updatedAt: row.updated_at }));
 }
 
 function slugify(title: string) {
@@ -273,6 +286,11 @@ export async function fetchAdminPosts() {
 
 export async function setPinnedPost(id: string | null) {
   const { error } = await supabase.rpc("set_pinned_post", { target_post_id: id });
+  if (error) throw error;
+}
+
+export async function saveOwnerPostFeedback(postId: string, body: string) {
+  const { error } = await supabase.rpc("save_owner_post_feedback", { target_post_id: postId, feedback_body: body });
   if (error) throw error;
 }
 

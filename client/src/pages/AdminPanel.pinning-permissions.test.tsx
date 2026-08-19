@@ -19,5 +19,6 @@ describe("AdminPanel pinning permissions", () => {
     render(<AdminPanel />);
     expect(screen.getByText("Admin access only")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /pin|unpin/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /leave author note/i })).toBeNull();
   });
 });

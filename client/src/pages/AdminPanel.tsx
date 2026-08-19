@@ -1,12 +1,97 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { fetchAdminApplications, fetchAdminComments, fetchAdminPosts, fetchAdminProfiles, hideComment, moderatePost, reviewWriterApplication, setPinnedPost, setProfileRole, useSupabaseQuery } from "@/lib/supabase";
-import { BadgeCheck, FileWarning, MessageSquareWarning, Pin, PinOff, ShieldCheck, UsersRound } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { canLeaveOwnerFeedback, isValidOwnerFeedback } from "@/lib/ownerFeedback";
+import { ChroniclePost, fetchAdminApplications, fetchAdminComments, fetchAdminPosts, fetchAdminProfiles, hideComment, moderatePost, reviewWriterApplication, saveOwnerPostFeedback, setPinnedPost, setProfileRole, useSupabaseQuery } from "@/lib/supabase";
+import { BadgeCheck, FileWarning, MessageSquareText, MessageSquareWarning, Pin, PinOff, ShieldCheck, UsersRound } from "lucide-react";
 import React, { useState } from "react";
 
 type AdminTab = "applications" | "people" | "articles" | "comments";
-function RetryNotice({ copy, onRetry }: { copy: string; onRetry: () => void }) { return <div className="query-error query-error--card"><strong>Information is not available.</strong><span>{copy}</span><Button size="sm" variant="outline" onClick={onRetry}>Try again</Button></div>; }
-function AccessNotice() { const { user } = useAuth(); return <div className="admin-access"><ShieldCheck size={24} /><h1>Admin access only</h1><p>{user ? "You are signed in, but your account is not an admin account." : "Sign in with the admin account to use these tools."}</p></div>; }
- function AdminContent() { const { user } = useAuth(); const isAdmin = user?.role === "admin"; const [tab, setTab] = useState<AdminTab>("applications"); const [busy, setBusy] = useState(false); const [actionError, setActionError] = useState<string>(); const applications = useSupabaseQuery(fetchAdminApplications, []); const people = useSupabaseQuery(fetchAdminProfiles, []); const articles = useSupabaseQuery(fetchAdminPosts, []); const comments = useSupabaseQuery(fetchAdminComments, []); const run = async (action: () => Promise<void>, refresh: () => Promise<unknown>) => { setBusy(true); setActionError(undefined); try { await action(); await refresh(); } catch (error) { setActionError(error instanceof Error ? error.message : "That action could not be completed."); } finally { setBusy(false); } }; if (!isAdmin) return <AccessNotice />; const tabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [{ id: "applications", label: "Applications", icon: <BadgeCheck size={15} /> }, { id: "people", label: "Users", icon: <UsersRound size={15} /> }, { id: "articles", label: "Posts", icon: <FileWarning size={15} /> }, { id: "comments", label: "Comments", icon: <MessageSquareWarning size={15} /> }]; return <div className="admin-console"><header className="admin-console__head"><div><span className="section-kicker"><ShieldCheck size={14} /> Admin</span><h1>Manage the site</h1><p>Check writer applications, manage user roles, and moderate posts and comments.</p></div></header><div className="admin-tabs" role="tablist">{tabs.map((item) => <button key={item.id} role="tab" aria-selected={tab === item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}>{item.icon}{item.label}</button>)}</div>{actionError && <p className="form-error">{actionError}</p>}{tab === "applications" && <section className="admin-section"><div className="admin-section__heading"><h2>Writer applications</h2><span>{applications.data?.filter((item) => item.status === "pending").length ?? 0} waiting</span></div><div className="moderation-list">{applications.isLoading && <p className="muted-copy">Loading applications…</p>}{applications.error && <RetryNotice copy="Writer applications could not load." onRetry={() => void applications.refetch()} />}{!applications.isLoading && !applications.error && !applications.data?.length && <p className="muted-copy">No applications yet.</p>}{applications.data?.map((application) => <article className="application-row" key={application.id}><div className="person-mark">{(application.userName || "A").slice(0, 1).toUpperCase()}</div><div className="application-row__body"><div className="row-title"><strong>{application.userName || "Unnamed user"}</strong><span className={`admin-status admin-status--${application.status}`}>{application.status}</span></div><small>{new Date(application.createdAt).toLocaleDateString()}</small><p>{application.motivation}</p></div>{application.status === "pending" && <div className="row-actions"><Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => reviewWriterApplication(application.id, application.userId, "rejected"), applications.refetch)}>Decline</Button><Button size="sm" disabled={busy} onClick={() => void run(() => reviewWriterApplication(application.id, application.userId, "approved"), async () => { await applications.refetch(); await people.refetch(); })}>Approve</Button></div>}</article>)}</div></section>}{tab === "people" && <section className="admin-section"><div className="admin-section__heading"><h2>Users</h2><span>{people.data?.length ?? 0} users</span></div><div className="admin-table"><div className="admin-table__head"><span>User</span><span>Role</span><span>Joined</span></div>{people.isLoading && <p className="muted-copy">Loading users…</p>}{people.error && <RetryNotice copy="Users could not load." onRetry={() => void people.refetch()} />}{people.data?.map((person) => <div className="admin-table__row" key={person.id}><div><strong>{person.name || "Unnamed user"}</strong><small>Chronicle member</small></div><select aria-label={`Change role for ${person.name || "user"}`} value={person.role} disabled={busy} onChange={(event) => void run(() => setProfileRole(person.id, event.target.value as "user" | "writer" | "admin"), people.refetch)}><option value="user">Reader</option><option value="writer">Writer</option><option value="admin">Admin</option></select><span>{new Date(person.createdAt).toLocaleDateString()}</span></div>)}</div></section>}{tab === "articles" && <section className="admin-section"><div className="admin-section__heading"><h2>Posts</h2><span>{articles.data?.length ?? 0} posts</span></div><div className="admin-table admin-table--articles"><div className="admin-table__head"><span>Post</span><span>Status</span><span>Writer</span><span>Actions</span></div>{articles.isLoading && <p className="muted-copy">Loading posts…</p>}{articles.error && <RetryNotice copy="Posts could not load." onRetry={() => void articles.refetch()} />}{articles.data?.map((article) => <div className="admin-table__row" key={article.id}><div><strong>{article.isPinned && <Pin size={12} className="admin-pin-icon" aria-label="Pinned post" />}{article.title}</strong><small>{article.category}{article.tags.length ? ` · ${article.tags.join(", ")}` : ""}</small></div><span className={`admin-status admin-status--${article.status}`}>{article.status}</span><span>{article.authorName || "Unknown"}</span><div className="row-actions">{article.status === "published" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => setPinnedPost(article.isPinned ? null : article.id), articles.refetch)}>{article.isPinned ? <><PinOff size={13} /> Unpin</> : <><Pin size={13} /> Pin</>}</Button>}{article.status === "published" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => moderatePost(article.id, "unpublish"), articles.refetch)}>Unpublish</Button>}<Button size="sm" variant="destructive" className="admin-delete-button" disabled={busy} onClick={() => { if (window.confirm(`Permanently delete “${article.title}”?`)) void run(() => moderatePost(article.id, "delete"), articles.refetch); }}>Delete</Button></div></div>)}</div></section>}{tab === "comments" && <section className="admin-section"><div className="admin-section__heading"><h2>Comments</h2><span>{comments.data?.filter((comment) => comment.status === "visible").length ?? 0} visible</span></div><div className="moderation-list">{comments.isLoading && <p className="muted-copy">Loading comments…</p>}{comments.error && <RetryNotice copy="Comments could not load." onRetry={() => void comments.refetch()} />}{!comments.isLoading && !comments.error && !comments.data?.length && <p className="muted-copy">No comments to check yet.</p>}{comments.data?.map((comment) => <article className="comment-row" key={comment.id}><div><div className="row-title"><strong>{comment.authorName || "Reader"}</strong><span className={`admin-status admin-status--${comment.status}`}>{comment.status}</span></div><small>On “{comment.postTitle || "a removed post"}” · {new Date(comment.createdAt).toLocaleDateString()}</small><p>{comment.body}</p></div>{comment.status === "visible" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => hideComment(comment.id), comments.refetch)}>Hide</Button>}</article>)}</div></section>}</div>; }
+
+function RetryNotice({ copy, onRetry }: { copy: string; onRetry: () => void }) {
+  return <div className="query-error query-error--card"><strong>Information is not available.</strong><span>{copy}</span><Button size="sm" variant="outline" onClick={onRetry}>Try again</Button></div>;
+}
+
+function AccessNotice() {
+  const { user } = useAuth();
+  return <div className="admin-access"><ShieldCheck size={24} /><h1>Admin access only</h1><p>{user ? "You are signed in, but your account is not an admin account." : "Sign in with the admin account to use these tools."}</p></div>;
+}
+
+function AdminContent() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const [tab, setTab] = useState<AdminTab>("applications");
+  const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string>();
+  const [feedbackPost, setFeedbackPost] = useState<ChroniclePost | null>(null);
+  const [feedbackBody, setFeedbackBody] = useState("");
+  const [feedbackError, setFeedbackError] = useState<string>();
+  const applications = useSupabaseQuery(fetchAdminApplications, []);
+  const people = useSupabaseQuery(fetchAdminProfiles, []);
+  const articles = useSupabaseQuery(fetchAdminPosts, []);
+  const comments = useSupabaseQuery(fetchAdminComments, []);
+
+  const run = async (action: () => Promise<void>, refresh: () => Promise<unknown>) => {
+    setBusy(true); setActionError(undefined);
+    try { await action(); await refresh(); }
+    catch (error) { setActionError(error instanceof Error ? error.message : "That action could not be completed."); }
+    finally { setBusy(false); }
+  };
+
+  const openFeedback = (article: ChroniclePost) => {
+    setFeedbackPost(article);
+    setFeedbackBody("");
+    setFeedbackError(undefined);
+  };
+
+  const saveFeedback = async () => {
+    if (!feedbackPost || !isValidOwnerFeedback(feedbackBody)) return;
+    setBusy(true); setFeedbackError(undefined);
+    try {
+      await saveOwnerPostFeedback(feedbackPost.id, feedbackBody);
+      await articles.refetch();
+      setFeedbackPost(null);
+      setFeedbackBody("");
+    } catch (error) {
+      setFeedbackError(error instanceof Error ? error.message : "The author note could not be saved.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin) return <AccessNotice />;
+
+  const tabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
+    { id: "applications", label: "Applications", icon: <BadgeCheck size={15} /> },
+    { id: "people", label: "Users", icon: <UsersRound size={15} /> },
+    { id: "articles", label: "Posts", icon: <FileWarning size={15} /> },
+    { id: "comments", label: "Comments", icon: <MessageSquareWarning size={15} /> },
+  ];
+
+  return <div className="admin-console">
+    <header className="admin-console__head"><div><span className="section-kicker"><ShieldCheck size={14} /> Admin</span><h1>Manage the site</h1><p>Check writer applications, manage user roles, and moderate posts and comments.</p></div></header>
+    <div className="admin-tabs" role="tablist">{tabs.map((item) => <button key={item.id} role="tab" aria-selected={tab === item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}>{item.icon}{item.label}</button>)}</div>
+    {actionError && <p className="form-error">{actionError}</p>}
+
+    {tab === "applications" && <section className="admin-section"><div className="admin-section__heading"><h2>Writer applications</h2><span>{applications.data?.filter((item) => item.status === "pending").length ?? 0} waiting</span></div><div className="moderation-list">{applications.isLoading && <p className="muted-copy">Loading applications…</p>}{applications.error && <RetryNotice copy="Writer applications could not load." onRetry={() => void applications.refetch()} />}{!applications.isLoading && !applications.error && !applications.data?.length && <p className="muted-copy">No applications yet.</p>}{applications.data?.map((application) => <article className="application-row" key={application.id}><div className="person-mark">{(application.userName || "A").slice(0, 1).toUpperCase()}</div><div className="application-row__body"><div className="row-title"><strong>{application.userName || "Unnamed user"}</strong><span className={`admin-status admin-status--${application.status}`}>{application.status}</span></div><small>{new Date(application.createdAt).toLocaleDateString()}</small><p>{application.motivation}</p></div>{application.status === "pending" && <div className="row-actions"><Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => reviewWriterApplication(application.id, application.userId, "rejected"), applications.refetch)}>Decline</Button><Button size="sm" disabled={busy} onClick={() => void run(() => reviewWriterApplication(application.id, application.userId, "approved"), async () => { await applications.refetch(); await people.refetch(); })}>Approve</Button></div>}</article>)}</div></section>}
+
+    {tab === "people" && <section className="admin-section"><div className="admin-section__heading"><h2>Users</h2><span>{people.data?.length ?? 0} users</span></div><div className="admin-table"><div className="admin-table__head"><span>User</span><span>Role</span><span>Joined</span></div>{people.isLoading && <p className="muted-copy">Loading users…</p>}{people.error && <RetryNotice copy="Users could not load." onRetry={() => void people.refetch()} />}{people.data?.map((person) => <div className="admin-table__row" key={person.id}><div><strong>{person.name || "Unnamed user"}</strong><small>Chronicle member</small></div><select aria-label={`Change role for ${person.name || "user"}`} value={person.role} disabled={busy} onChange={(event) => void run(() => setProfileRole(person.id, event.target.value as "user" | "writer" | "admin"), people.refetch)}><option value="user">Reader</option><option value="writer">Writer</option><option value="admin">Admin</option></select><span>{new Date(person.createdAt).toLocaleDateString()}</span></div>)}</div></section>}
+
+    {tab === "articles" && <section className="admin-section"><div className="admin-section__heading"><h2>Posts</h2><span>{articles.data?.length ?? 0} posts</span></div><div className="admin-table admin-table--articles"><div className="admin-table__head"><span>Post</span><span>Status</span><span>Writer</span><span>Actions</span></div>{articles.isLoading && <p className="muted-copy">Loading posts…</p>}{articles.error && <RetryNotice copy="Posts could not load." onRetry={() => void articles.refetch()} />}{articles.data?.map((article) => <div className="admin-table__row" key={article.id}><div><strong>{article.isPinned && <Pin size={12} className="admin-pin-icon" aria-label="Pinned post" />}{article.title}</strong><small>{article.category}{article.tags.length ? ` · ${article.tags.join(", ")}` : ""}</small></div><span className={`admin-status admin-status--${article.status}`}>{article.status}</span><span>{article.authorName || "Unknown"}</span><div className="row-actions">{article.status === "published" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => setPinnedPost(article.isPinned ? null : article.id), articles.refetch)}>{article.isPinned ? <><PinOff size={13} /> Unpin</> : <><Pin size={13} /> Pin</>}</Button>}{article.status === "published" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => moderatePost(article.id, "unpublish"), articles.refetch)}>Unpublish</Button>}{canLeaveOwnerFeedback(article.status) && <Button size="sm" variant="outline" className="admin-feedback-button" disabled={busy} onClick={() => openFeedback(article)}><MessageSquareText size={13} /> Leave author note</Button>}<Button size="sm" variant="destructive" className="admin-delete-button" disabled={busy} onClick={() => { if (window.confirm(`Permanently delete “${article.title}”?`)) void run(() => moderatePost(article.id, "delete"), articles.refetch); }}>Delete</Button></div></div>)}</div></section>}
+
+    {tab === "comments" && <section className="admin-section"><div className="admin-section__heading"><h2>Comments</h2><span>{comments.data?.filter((comment) => comment.status === "visible").length ?? 0} visible</span></div><div className="moderation-list">{comments.isLoading && <p className="muted-copy">Loading comments…</p>}{comments.error && <RetryNotice copy="Comments could not load." onRetry={() => void comments.refetch()} />}{!comments.isLoading && !comments.error && !comments.data?.length && <p className="muted-copy">No comments to check yet.</p>}{comments.data?.map((comment) => <article className="comment-row" key={comment.id}><div><div className="row-title"><strong>{comment.authorName || "Reader"}</strong><span className={`admin-status admin-status--${comment.status}`}>{comment.status}</span></div><small>On “{comment.postTitle || "a removed post"}” · {new Date(comment.createdAt).toLocaleDateString()}</small><p>{comment.body}</p></div>{comment.status === "visible" && <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => hideComment(comment.id), comments.refetch)}>Hide</Button>}</article>)}</div></section>}
+
+    <Dialog open={Boolean(feedbackPost)} onOpenChange={(open) => { if (!open && !busy) setFeedbackPost(null); }}>
+      <DialogContent className="owner-feedback-dialog">
+        <DialogHeader><DialogTitle>Private note for {feedbackPost?.authorName || "the author"}</DialogTitle><DialogDescription>This note is only visible to this post’s author and to you. Markdown works here, including headings, bold text, lists, links, and quotes.</DialogDescription></DialogHeader>
+        <Textarea value={feedbackBody} onChange={(event) => { setFeedbackBody(event.target.value); setFeedbackError(undefined); }} placeholder={"## What needs changing\n\nPlease add a source for..."} aria-label="Private author feedback in Markdown" className="owner-feedback-editor" />
+        {feedbackError && <p className="form-error">{feedbackError}</p>}
+        <DialogFooter><Button variant="outline" disabled={busy} onClick={() => setFeedbackPost(null)}>Cancel</Button><Button disabled={busy || !isValidOwnerFeedback(feedbackBody)} onClick={() => void saveFeedback()}>{busy ? "Saving…" : "Save private note"}</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>;
+}
+
 export default function AdminPanel() { return <DashboardLayout><AdminContent /></DashboardLayout>; }
