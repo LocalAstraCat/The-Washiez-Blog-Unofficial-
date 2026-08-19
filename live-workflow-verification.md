@@ -35,3 +35,7 @@ The GitHub Pages workflow for commit `9967481` completed successfully. The Astra
 ## Admin action visibility fix
 
 The GitHub Pages workflow for commit `8ad4cd2` completed successfully. In the live Posts moderation table, each published row visibly displays **Pin**, **Unpublish**, and a high-contrast red **Delete** control; unpublished rows display a readable **Delete** control. No moderation action was triggered during verification.
+
+## Basic SEO package
+
+The GitHub Pages workflow for commit `761cbac` completed successfully. Direct live HTTP checks confirmed that `/robots.txt` allows crawler access and names the canonical sitemap URL, while `/sitemap.xml` lists the public archive, Guidelines page, and every published article with its update timestamp. The raw homepage HTML includes a description, canonical URL, Open Graph title, Twitter card declaration, and WebSite structured-data block.

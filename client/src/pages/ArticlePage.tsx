@@ -5,7 +5,7 @@ import { Seo } from "@/components/Seo";
 import { articleDescription, publicUrl, SITE_NAME } from "@/lib/seo";
 import { castVote, createComment, fetchComments, fetchPublishedPost, fetchVoteSummary, useSupabaseQuery } from "@/lib/supabase";
 import { ArrowBigDown, ArrowBigUp, ArrowLeft, CalendarDays, MessageSquare, Send } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Streamdown } from "streamdown";
 import { Link, useLocation, useRoute } from "wouter";
 

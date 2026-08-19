@@ -76,8 +76,12 @@
 - [ ] Add an owner-only Markdown feedback editor to the admin Posts moderation controls
 - [ ] Show Markdown-rendered owner feedback to the relevant author in the writer desk
 - [ ] Add access-control and rendering tests for private unpublished-post feedback
-- [ ] Add GitHub Pages crawler guidance through robots.txt with the public sitemap location
-- [ ] Generate a sitemap containing the public archive, Guidelines page, and published article URLs
-- [ ] Add canonical, description, Open Graph, Twitter, and publication structured-data metadata for public routes
-- [ ] Add regression coverage for generated SEO files and client-side public route metadata
-- [ ] Verify the published robots.txt, sitemap.xml, and homepage metadata on GitHub Pages
+- [x] Add GitHub Pages crawler guidance through robots.txt with the public sitemap location
+- [x] Generate a sitemap containing the public archive, Guidelines page, and published article URLs
+- [x] Add canonical, description, Open Graph, Twitter, and publication structured-data metadata for public routes
+- [x] Add regression coverage for generated SEO files and client-side public route metadata
+- [x] Verify the published robots.txt, sitemap.xml, and homepage metadata on GitHub Pages
+- [x] Add automated tests for robots.txt and generated sitemap XML contents
+- [x] Add DOM-level coverage for canonical, social, and structured-data updates on public routes
+- [x] Add route-level metadata tests for the public archive, individual article, and Guidelines pages
+- [x] Add sitemap generation coverage for a mocked published article URL and its lastmod timestamp

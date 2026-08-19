@@ -9,7 +9,7 @@ export function publicUrl(path = "/") {
 }
 
 export function articleDescription(body: string, maxLength = 155) {
-  const compact = body.replace(/[#*_>`\[\]()]/g, "").replace(/\s+/g, " ").trim();
+  const compact = String(body ?? "").replace(/[#*_>`\[\]()]/g, "").replace(/\s+/g, " ").trim();
   if (compact.length <= maxLength) return compact || SITE_DESCRIPTION;
   return `${compact.slice(0, maxLength - 1).trimEnd()}…`;
 }
