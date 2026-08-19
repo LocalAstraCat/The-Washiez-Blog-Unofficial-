@@ -1,0 +1,39 @@
+export type BrowserPushSubscription = { endpoint: string; p256dhKey: string; authKey: string };
+
+export function browserPushSupported() {
+  return typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+}
+
+export function browserPushWorkerUrl(baseUrl: string) {
+  return `${baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`}chronicle-push-sw.js`;
+}
+
+export function vapidPublicKeyBytes(value: string) {
+  const padded = `${value.replace(/-/g, "+").replace(/_/g, "/")}${"=".repeat((4 - (value.length % 4)) % 4)}`;
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+function serialize(subscription: PushSubscription): BrowserPushSubscription {
+  const json = subscription.toJSON();
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) throw new Error("Your browser did not return a complete push subscription.");
+  return { endpoint: json.endpoint, p256dhKey: json.keys.p256dh, authKey: json.keys.auth };
+}
+
+export async function createBrowserPushSubscription(vapidPublicKey: string, baseUrl: string) {
+  if (!browserPushSupported()) throw new Error("This browser does not support push notifications.");
+  const registration = await navigator.serviceWorker.register(browserPushWorkerUrl(baseUrl), { scope: baseUrl });
+  const existing = await registration.pushManager.getSubscription();
+  const subscription = existing ?? await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidPublicKeyBytes(vapidPublicKey) });
+  return serialize(subscription);
+}
+
+export async function removeBrowserPushSubscription(baseUrl: string) {
+  if (!browserPushSupported()) return null;
+  const registration = await navigator.serviceWorker.getRegistration(baseUrl);
+  const subscription = await registration?.pushManager.getSubscription();
+  if (!subscription) return null;
+  const serialized = serialize(subscription);
+  await subscription.unsubscribe();
+  return serialized;
+}

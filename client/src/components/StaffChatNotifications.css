@@ -1,0 +1,33 @@
+.staff-chat-notifications {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px 18px;
+  align-items:center;
+  margin:0 0 20px;
+  padding:15px 17px;
+  border:1px solid #cde0ef;
+  border-radius:12px;
+  background:linear-gradient(112deg,#f8fcff 0%,#fbfef7 100%);
+  box-shadow:0 8px 20px rgba(31,80,122,.04);
+}
+.staff-chat-notifications__heading { display:flex; align-items:flex-start; gap:9px; color:#2672ac; }
+.staff-chat-notifications__heading > svg { flex:0 0 auto; margin-top:2px; }
+.staff-chat-notifications__heading strong { color:#334e69; font-size:11px; }
+.staff-chat-notifications__heading p { margin:4px 0 0; color:#64758c; font-size:10px; line-height:1.55; }
+.staff-chat-notifications code { padding:1px 3px; border-radius:3px; background:#e7f4ff; color:#2972a8; font-family:var(--font-mono); }
+.staff-chat-notifications__actions { display:grid; justify-items:end; gap:7px; }
+.staff-chat-notifications__actions button { min-height:31px; font-size:10px; font-weight:800; }
+.staff-chat-notifications__actions span { display:inline-flex; align-items:center; gap:4px; color:#728197; font-size:9px; text-align:right; }
+.staff-chat-notifications__actions span svg { color:#5a9626; }
+.staff-chat-notifications__status { margin:0; color:#67768c; font-size:10px; }
+.staff-chat-email-foundation { grid-column:1 / -1; display:flex; align-items:flex-start; gap:7px; padding-top:10px; border-top:1px solid #dfeaf2; color:#69788e; }
+.staff-chat-email-foundation svg { flex:0 0 auto; margin-top:1px; color:#c18431; }
+.staff-chat-email-foundation p { margin:0; font-size:9px; line-height:1.55; }
+.staff-chat-email-foundation strong { color:#6b572d; }
+.staff-chat-notifications__message { grid-column:1 / -1; margin:0; color:#377323; font-size:10px; font-weight:700; }
+
+@media (max-width:760px) {
+  .staff-chat-notifications { grid-template-columns:1fr; gap:12px; margin-bottom:16px; padding:14px; }
+  .staff-chat-notifications__actions { justify-items:start; }
+  .staff-chat-notifications__actions span { text-align:left; }
+}

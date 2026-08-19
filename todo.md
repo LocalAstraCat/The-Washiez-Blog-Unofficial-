@@ -100,3 +100,15 @@
 - [x] Make Enter send staff-chat messages while Shift+Enter continues to add a new line
 - [x] Apply the chat migration, verify the live permissions, and publish the GitHub Pages update
 - [x] Deliver the staff-chat feature through GitHub Pages only, without creating a Manus checkpoint or publishing the Manus site
+- [x] Compare browser push and email notifications for @admins, @authors, and @owner mentions
+- [x] Confirm notification opt-in and recipient rules for staff role mentions
+- [x] Implement the chosen GitHub Pages-compatible role-mention notification channel
+- [ ] Test role-targeted notification delivery and deploy it through GitHub Pages only
+- [x] Store per-member browser push subscriptions and notification preferences with secure Supabase policies
+- [x] Send role-targeted browser push alerts for @admins, @authors, and @owner mentions from a secure Supabase function
+- [x] Add an explicit staff-chat notification opt-in control and a GitHub Pages service worker
+- [x] Add an inactive transactional-email preference and notification-outbox foundation for later provider activation
+- [x] Document the email-provider prerequisites without enabling or sending email notifications
+- [x] Secure the push sender with a private webhook token and document that managed Database Webhooks were unavailable before using the pg_net fallback
+- [x] Replace the unavailable Database Webhooks trigger with a secured pg_net PostgreSQL trigger for queued browser-push delivery
+- [x] Add the Supabase publishable-key headers required by the Edge Function gateway to the pg_net trigger

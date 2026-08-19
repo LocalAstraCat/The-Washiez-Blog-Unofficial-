@@ -17,7 +17,7 @@ vi.mock("@/components/ui/input", () => ({ Input: (props: React.ComponentProps<"i
 vi.mock("@/components/ui/textarea", () => ({ Textarea: (props: React.ComponentProps<"textarea">) => <textarea {...props} /> }));
 vi.mock("streamdown", () => ({ Streamdown: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("@/lib/supabase", () => ({
-  createChatMessage: mocks.createChatMessage, fetchChatMessages: vi.fn(), fetchChatOwnerId: vi.fn(), setChatMessagePinned: vi.fn(), subscribeToChatRoom: () => () => {},
+  createChatMessage: mocks.createChatMessage, fetchChatMessages: vi.fn(), fetchChatOwnerId: vi.fn(), fetchNotificationPreferences: vi.fn(), fetchPushVapidPublicKey: vi.fn(), removePushSubscription: vi.fn(), saveNotificationPreferences: vi.fn(), savePushSubscription: vi.fn(), setChatMessagePinned: vi.fn(), subscribeToChatRoom: () => () => {},
   useSupabaseQuery: () => ({ data: [], isLoading: false, error: undefined, refetch: mocks.refetch }),
 }));
 

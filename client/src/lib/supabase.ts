@@ -186,6 +186,57 @@ export async function fetchChatOwnerId() {
   return (data?.owner_id as string | null | undefined) ?? null;
 }
 
+export type NotificationPreferences = { browserPushMentionsEnabled: boolean; emailMentionsEnabled: boolean };
+export type PushSubscriptionInput = { endpoint: string; p256dhKey: string; authKey: string };
+
+export async function fetchNotificationPreferences() {
+  const userId = await currentUserId();
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .select("browser_push_mentions_enabled,email_mentions_enabled")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return {
+    browserPushMentionsEnabled: Boolean(data?.browser_push_mentions_enabled),
+    emailMentionsEnabled: Boolean(data?.email_mentions_enabled),
+  } satisfies NotificationPreferences;
+}
+
+export async function saveNotificationPreferences(preferences: NotificationPreferences) {
+  const userId = await currentUserId();
+  const { error } = await supabase.from("notification_preferences").upsert({
+    user_id: userId,
+    browser_push_mentions_enabled: preferences.browserPushMentionsEnabled,
+    email_mentions_enabled: preferences.emailMentionsEnabled,
+  }, { onConflict: "user_id" });
+  if (error) throw error;
+}
+
+export async function fetchPushVapidPublicKey() {
+  const { data, error } = await supabase.from("site_settings").select("push_vapid_public_key").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  return (data?.push_vapid_public_key as string | null | undefined) ?? null;
+}
+
+export async function savePushSubscription(subscription: PushSubscriptionInput) {
+  const userId = await currentUserId();
+  const { error } = await supabase.from("push_subscriptions").upsert({
+    user_id: userId,
+    endpoint: subscription.endpoint,
+    p256dh_key: subscription.p256dhKey,
+    auth_key: subscription.authKey,
+    last_seen_at: new Date().toISOString(),
+  }, { onConflict: "endpoint" });
+  if (error) throw error;
+}
+
+export async function removePushSubscription(endpoint: string) {
+  const userId = await currentUserId();
+  const { error } = await supabase.from("push_subscriptions").delete().eq("user_id", userId).eq("endpoint", endpoint);
+  if (error) throw error;
+}
+
 export async function createChatMessage(roomId: ChatRoomId, body: string) {
   const authorId = await currentUserId();
   const trimmedBody = body.trim();
