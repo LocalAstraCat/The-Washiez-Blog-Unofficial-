@@ -23,7 +23,7 @@
 - [x] Redesign public, writer, and owner pages with Washiez car-wash color cues and graphic energy
 - [x] Prepare the selected GitHub repository with a documented GitHub Pages hybrid deployment path
 - [x] Verify the rebranded desktop and mobile presentation before saving an updated checkpoint
-- [ ] Configure a Supabase project for authentication, database, and role-based security
+- [x] Configure a Supabase project for authentication, database, and role-based security
 - [ ] Migrate the Chronicle’s live publishing features to a GitHub Pages-compatible Supabase architecture
 - [ ] Publish the static frontend through GitHub Pages and verify the deployed site
 - [ ] Apply the checked-in Supabase schema and activate production native account profiles before live publishing features can operate
@@ -33,6 +33,7 @@
 - [ ] Verify deployed native username/password sign-in and protected account flows end to end
 - [ ] Verify optional email confirmation and resend behavior end to end
 - [ ] Complete a production Pages build and deployment after native account changes
+- [ ] Diagnose and fix missing optional email verification delivery for native accounts
 - [ ] Fix the GitHub Pages workflow package-manager configuration conflict
 - [x] Fix the GitHub Pages workflow package-manager configuration conflict
 - [ ] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff

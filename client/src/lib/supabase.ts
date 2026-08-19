@@ -28,8 +28,10 @@ export async function signUpWithUsername({ username, password, email }: { userna
   });
   if (error) throw error;
   if (pendingEmail && data.user) {
-    const { error: verificationError } = await supabase.auth.updateUser({ email: pendingEmail }, { emailRedirectTo: nativeRedirectUrl });
-    if (verificationError) throw verificationError;
+    if (!data.session) {
+      await signInWithIdentifier(canonicalUsername, password);
+    }
+    await requestOptionalEmailVerification(pendingEmail);
   }
   return { verificationSent: Boolean(pendingEmail) };
 }
@@ -42,7 +44,14 @@ export async function signInWithIdentifier(identifier: string, password: string)
   if (error) throw error;
 }
 
-export async function resendOptionalEmailVerification(pendingEmail: string) {
+export async function requestOptionalEmailVerification(pendingEmail: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sign in to verify your optional email address.");
+  if (user.email?.toLowerCase() !== pendingEmail.toLowerCase()) {
+    const { error } = await supabase.auth.updateUser({ email: pendingEmail }, { emailRedirectTo: nativeRedirectUrl });
+    if (error) throw error;
+    return;
+  }
   const { error } = await supabase.auth.resend({ type: "email_change", email: pendingEmail, options: { emailRedirectTo: nativeRedirectUrl } });
   if (error) throw error;
 }

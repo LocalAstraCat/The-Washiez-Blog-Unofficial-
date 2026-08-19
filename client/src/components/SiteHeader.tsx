@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ChronicleAccountDialog } from "@/components/ChronicleAccountDialog";
-import { resendOptionalEmailVerification } from "@/lib/supabase";
+import { requestOptionalEmailVerification } from "@/lib/supabase";
 import { BookOpenText, LogOut, PenLine, ShieldCheck } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
@@ -26,7 +26,7 @@ export function SiteHeader() {
           {!loading && isAuthenticated && (
             <>
               <span className="signed-in-name">{user?.name ?? "Account"}</span>
-              {user?.pendingEmail && !user.emailVerified && <Button variant="ghost" size="sm" className="verify-email" onClick={() => void resendOptionalEmailVerification(user.pendingEmail!)}>Verify email</Button>}
+              {user?.pendingEmail && !user.emailVerified && <Button variant="ghost" size="sm" className="verify-email" onClick={() => void requestOptionalEmailVerification(user.pendingEmail!)}>Verify email</Button>}
               {canWrite && <Button variant="outline" size="sm" onClick={() => setLocation("/workspace")}><PenLine size={14} /> Write</Button>}
               {user?.role === "admin" && <Button variant="ghost" size="icon" aria-label="Open moderation" onClick={() => setLocation("/admin")}><ShieldCheck size={17} /></Button>}
               <Button variant="ghost" size="icon" aria-label="Sign out" onClick={logout}><LogOut size={17} /></Button>

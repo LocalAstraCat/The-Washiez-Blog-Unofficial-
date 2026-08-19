@@ -14,4 +14,9 @@ describe("Supabase public connection", () => {
 
     expect(response.ok).toBe(true);
   }, 15000);
+
+  it("has the direct database credential available for the reviewed schema migration", () => {
+    expect(process.env.SUPABASE_DB_PASSWORD).toBeTruthy();
+    expect(process.env.SUPABASE_DB_PASSWORD!.length).toBeGreaterThanOrEqual(8);
+  });
 });
