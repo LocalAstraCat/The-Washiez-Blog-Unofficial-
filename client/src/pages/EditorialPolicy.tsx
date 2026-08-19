@@ -1,12 +1,3 @@
 import { BookMarked, Scale, SearchCheck } from "lucide-react";
 
-export default function EditorialPolicy() {
-  return <main className="policy-shell">
-    <div className="page-intro"><span className="section-kicker"><BookMarked size={15} /> Editorial policy</span><h1>A public record, handled with care.</h1><p>The Washiez Chronicle is structured as a community reference and blog. It is intended to make the game’s history, updates, and discussions easier to find—not to amplify unverified claims.</p></div>
-    <div className="policy-grid">
-      <article><SearchCheck size={22} /><h2>Source-aware writing</h2><p>Writers should link to primary materials when they are available, identify speculation as such, and provide enough context for readers to reach their own conclusions.</p></article>
-      <article><Scale size={22} /><h2>Fair presentation</h2><p>Posts should separate documented events from commentary, avoid harassment, and use measured language for contested topics or ongoing disputes.</p></article>
-      <article><BookMarked size={22} /><h2>Editorial review</h2><p>New contributors apply before receiving writer access. The site owner can revise access, unpublish content, or moderate comments when the standards are not met.</p></article>
-    </div>
-  </main>;
-}
+export default function EditorialPolicy() { return <main className="policy-shell"><div className="page-intro"><span className="section-kicker"><BookMarked size={15} /> Site guidelines</span><h1>How we keep posts useful.</h1><p>The Washiez Chronicle is a community wiki and blog. We want to make it easy to find game history, updates, and discussions without spreading claims that have not been checked.</p></div><div className="policy-grid"><article><SearchCheck size={22} /><h2>Use sources</h2><p>Writers should link to original sources when possible. If something is only a guess, they should say so.</p></article><article><Scale size={22} /><h2>Be fair</h2><p>Posts should separate facts from opinions. Do not harass people or make strong claims without proof.</p></article><article><BookMarked size={22} /><h2>Site review</h2><p>New writers need approval. The site owner can change access, remove posts, or hide comments when needed.</p></article></div></main>; }

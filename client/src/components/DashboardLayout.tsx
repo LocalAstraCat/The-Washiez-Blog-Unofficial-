@@ -27,8 +27,8 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Moderation", path: "/admin" },
-  { icon: Users, label: "Public archive", path: "/" },
+  { icon: LayoutDashboard, label: "Admin", path: "/admin" },
+  { icon: Users, label: "Posts", path: "/" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

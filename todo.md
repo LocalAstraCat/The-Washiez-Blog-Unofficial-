@@ -40,3 +40,14 @@
 - [x] Fix the GitHub Pages workflow package-manager configuration conflict
 - [ ] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
 - [x] Document the Supabase SQL Editor blocker and provide the reviewed migration as a repository handoff
+- [x] Add automatic local draft recovery so unsaved editor input survives navigation, refreshes, and reopened browser tabs
+- [x] Add debounced server-side draft autosave for signed-in writers without creating duplicate articles
+- [x] Add automated tests covering draft recovery, save timing, and server-save failure handling
+- [x] Add component-level autosave timing coverage that prevents duplicate first-draft creation
+- [x] Add component-level server-save failure coverage that proves the local recovery fallback is shown
+- [ ] Review the user-supplied Excalidraw file and apply an adapted visual design using its layout and palette as reference
+- [x] Simplify the visual hierarchy across public, writer, and owner screens while retaining the original Washiez colour palette
+- [x] Rewrite site navigation, headings, actions, form labels, status messages, and empty states in plain language
+- [ ] Verify the simplified desktop and mobile interface with visual review before publishing
+- [ ] Push the simplified redesign and writer autosave update to the selected GitHub Pages repository
+- [ ] Verify the completed GitHub Pages workflow and the live public site
