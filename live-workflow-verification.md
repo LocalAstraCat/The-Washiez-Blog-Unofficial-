@@ -23,3 +23,11 @@ The GitHub Pages workflow for commit `8a77fc7` completed successfully. The direc
 ## Public writer application entry point
 
 The public homepage was verified after the GitHub Pages workflow for commit `eb5a845` completed successfully. It now displays an **Apply to write** call-to-action. The link routes to `/The-Washiez-Blog-Unofficial-/workspace`; approved writers reach their desk there, while other signed-in accounts receive the existing writer-application screen.
+
+## Markdown helper and pinned-post controls
+
+The GitHub Pages workflow for commit `9967481` completed successfully. The Astra administrator account was used to inspect the live writer workspace and admin Posts tab without changing content:
+
+- The writer editor displays the **Markdown quick help** panel beneath the post field.
+- The administrator sees **Pin** controls for each published post in the Posts moderation tab.
+- The current `site_settings.pinned_post_id` remains clear; no post was selected or repositioned during verification.

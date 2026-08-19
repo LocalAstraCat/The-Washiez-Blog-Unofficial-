@@ -69,4 +69,4 @@
 - [x] Add tests for single-pin behavior, permissions, archive ordering, and Markdown reference visibility
 - [x] Add automated coverage proving non-admins cannot see or use the pin controls
 - [x] Add an integration check confirming the Supabase pinning RPC rejects non-admin callers
-- [ ] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
+- [x] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
