@@ -31,3 +31,7 @@ The GitHub Pages workflow for commit `9967481` completed successfully. The Astra
 - The writer editor displays the **Markdown quick help** panel beneath the post field.
 - The administrator sees **Pin** controls for each published post in the Posts moderation tab.
 - The current `site_settings.pinned_post_id` remains clear; no post was selected or repositioned during verification.
+
+## Admin action visibility fix
+
+The GitHub Pages workflow for commit `8ad4cd2` completed successfully. In the live Posts moderation table, each published row visibly displays **Pin**, **Unpublish**, and a high-contrast red **Delete** control; unpublished rows display a readable **Delete** control. No moderation action was triggered during verification.
