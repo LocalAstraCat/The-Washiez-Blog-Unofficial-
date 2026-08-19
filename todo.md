@@ -53,3 +53,5 @@
 - [ ] Visually verify the simplified admin console on desktop and mobile
 - [x] Push the simplified redesign and writer autosave update to the selected GitHub Pages repository
 - [x] Verify the completed GitHub Pages workflow and the live public site
+- [ ] Fix the GitHub Pages Guidelines link so it preserves the repository base path instead of opening /about at the domain root
+- [ ] Add regression coverage for repository-base-path internal navigation and verify the live Guidelines page

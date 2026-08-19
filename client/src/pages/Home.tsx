@@ -2,6 +2,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { sitePath } from "@/lib/sitePaths";
 import { fetchPublishedPosts, useSupabaseQuery } from "@/lib/supabase";
 import { BookOpen, ChevronRight, FileText, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -21,7 +22,7 @@ export default function Home() {
     <SiteHeader />
     <main>
       <section className="hero">
-        <div className="hero__content"><span className="section-kicker"><BookOpen size={15} /> Washiez community wiki</span><h1>Washiez stories, <em>all in one place.</em></h1><p>Read about game updates, history, big community moments, and more. Anyone can read the posts.</p><div className="hero__actions"><a href="#archive" className="button-link">Browse posts <ChevronRight size={16} /></a><a href="/about" className="quiet-link">How we write</a></div></div>
+        <div className="hero__content"><span className="section-kicker"><BookOpen size={15} /> Washiez community wiki</span><h1>Washiez stories, <em>all in one place.</em></h1><p>Read about game updates, history, big community moments, and more. Anyone can read the posts.</p><div className="hero__actions"><a href="#archive" className="button-link">Browse posts <ChevronRight size={16} /></a><a href={sitePath("/about")} className="quiet-link">How we write</a></div></div>
         <aside className="hero__note"><span>About this site</span><p>You can read without an account. Sign in if you want to comment, vote, or apply to write.</p><div><ShieldCheck size={17} /> Writers are approved first</div></aside>
       </section>
       <section className="archive-section" id="archive">
