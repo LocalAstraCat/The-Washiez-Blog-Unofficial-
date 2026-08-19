@@ -132,6 +132,82 @@ export async function fetchPinnedPostId() {
   return (data?.pinned_post_id as string | null | undefined) ?? null;
 }
 
+export type ChatRoomId = "admins" | "writers";
+export type { ChatRoleMention } from "./staffChat";
+export type ChronicleChatMessage = {
+  id: string;
+  roomId: ChatRoomId;
+  authorId: string;
+  authorName: string | null;
+  authorRole: "user" | "writer" | "admin" | null;
+  body: string;
+  isPinned: boolean;
+  pinnedAt: string | null;
+  pinnedBy: string | null;
+  createdAt: string;
+};
+
+type ChatProfileJoin = { display_name: string | null; role: "user" | "writer" | "admin" | null } | { display_name: string | null; role: "user" | "writer" | "admin" | null }[] | null;
+type ChatMessageRow = {
+  id: string; room_id: ChatRoomId; author_id: string; body: string; is_pinned: boolean;
+  pinned_at: string | null; pinned_by: string | null; created_at: string; profiles: ChatProfileJoin;
+};
+
+function toChatMessage(row: ChatMessageRow): ChronicleChatMessage {
+  const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+  return {
+    id: row.id, roomId: row.room_id, authorId: row.author_id, authorName: profile?.display_name ?? null,
+    authorRole: profile?.role ?? null, body: row.body, isPinned: row.is_pinned, pinnedAt: row.pinned_at,
+    pinnedBy: row.pinned_by, createdAt: row.created_at,
+  };
+}
+
+export { chatMentionRoles, messageMentionsViewer } from "./staffChat";
+
+export async function fetchChatMessages(roomId: ChatRoomId, search = "") {
+  let query = supabase
+    .from("chat_messages")
+    .select("id,room_id,author_id,body,is_pinned,pinned_at,pinned_by,created_at,profiles!chat_messages_author_id_fkey(display_name,role)")
+    .eq("room_id", roomId)
+    .order("is_pinned", { ascending: false })
+    .order("pinned_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(150);
+  const trimmedSearch = search.trim();
+  if (trimmedSearch) query = query.ilike("body", `%${trimmedSearch}%`);
+  const { data, error } = await query;
+  if (error) throw error;
+  return ((data ?? []) as ChatMessageRow[]).map(toChatMessage);
+}
+
+export async function fetchChatOwnerId() {
+  const { data, error } = await supabase.from("site_settings").select("owner_id").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  return (data?.owner_id as string | null | undefined) ?? null;
+}
+
+export async function createChatMessage(roomId: ChatRoomId, body: string) {
+  const authorId = await currentUserId();
+  const trimmedBody = body.trim();
+  if (!trimmedBody) throw new Error("Write a message before sending it.");
+  if (trimmedBody.length > 4000) throw new Error("Keep messages to 4,000 characters or fewer.");
+  const { error } = await supabase.from("chat_messages").insert({ room_id: roomId, author_id: authorId, body: trimmedBody });
+  if (error) throw error;
+}
+
+export async function setChatMessagePinned(messageId: string, shouldPin: boolean) {
+  const { error } = await supabase.rpc("set_chat_message_pinned", { target_message_id: messageId, should_pin: shouldPin });
+  if (error) throw error;
+}
+
+export function subscribeToChatRoom(roomId: ChatRoomId, onNewMessage: () => void) {
+  const channel = supabase
+    .channel(`chronicle-staff-room-${roomId}`)
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages", filter: `room_id=eq.${roomId}` }, onNewMessage)
+    .subscribe();
+  return () => { void supabase.removeChannel(channel); };
+}
+
 export type ChronicleComment = { id: string; body: string; createdAt: string; authorName: string | null };
 
 export async function fetchComments(postId: string) {

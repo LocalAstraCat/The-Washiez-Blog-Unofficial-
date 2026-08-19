@@ -72,10 +72,10 @@
 - [x] Verify the live Markdown helper and admin pin controls without changing the selected pinned post
 - [x] Fix the admin Posts Delete action so its label remains visible and readable without text selection
 - [x] Verify the live Delete action remains readable alongside Pin and Unpublish controls
-- [ ] Add secure private owner feedback for unpublished posts, visible only to the post author and admins
-- [ ] Add an owner-only Markdown feedback editor to the admin Posts moderation controls
-- [ ] Show Markdown-rendered owner feedback to the relevant author in the writer desk
-- [ ] Add access-control and rendering tests for private unpublished-post feedback
+- [x] Add secure private owner feedback for unpublished posts, visible only to the post author and admins
+- [x] Add an owner-only Markdown feedback editor to the admin Posts moderation controls
+- [x] Show Markdown-rendered owner feedback to the relevant author in the writer desk
+- [x] Add access-control and rendering tests for private unpublished-post feedback
 - [x] Add GitHub Pages crawler guidance through robots.txt with the public sitemap location
 - [x] Generate a sitemap containing the public archive, Guidelines page, and published article URLs
 - [x] Add canonical, description, Open Graph, Twitter, and publication structured-data metadata for public routes
@@ -85,3 +85,18 @@
 - [x] Add DOM-level coverage for canonical, social, and structured-data updates on public routes
 - [x] Add route-level metadata tests for the public archive, individual article, and Guidelines pages
 - [x] Add sitemap generation coverage for a mocked published article URL and its lastmod timestamp
+- [x] Compare native private rooms with a Discord-based approach for administrator and writer communication
+- [x] Define access rules for an admin-only room and a writer room shared with admins
+- [x] Select a message-storage and retention approach that avoids unnecessary file storage
+- [x] Estimate conservative message capacity for 100-character text chat under the Supabase free-plan database threshold
+- [x] Create secure Supabase chat rooms for administrators and for writers plus administrators
+- [x] Enforce room membership, message visibility, and write permissions with Supabase Row Level Security
+- [x] Add admin-only pin and unpin controls for individual chat messages
+- [x] Automatically remove unpinned chat messages after three months without retaining attachments
+- [x] Add private-room search that only returns messages the signed-in member can read
+- [x] Support and explain @admins, @authors, and @owner role mentions in staff rooms
+- [x] Add realtime room delivery, protected navigation, and a responsive staff-chat interface
+- [x] Add Vitest coverage for chat access control, retention eligibility, mentions, search, and pinning
+- [x] Make Enter send staff-chat messages while Shift+Enter continues to add a new line
+- [ ] Apply the chat migration, verify the live permissions, and publish the GitHub Pages update
+- [ ] Deliver the staff-chat feature through GitHub Pages only, without creating a Manus checkpoint or publishing the Manus site

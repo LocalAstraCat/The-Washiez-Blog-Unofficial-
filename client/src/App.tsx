@@ -8,6 +8,7 @@ import ArticlePage from "./pages/ArticlePage";
 import AdminPanel from "./pages/AdminPanel";
 import EditorialPolicy from "./pages/EditorialPolicy";
 import Home from "./pages/Home";
+import StaffChat from "./pages/StaffChat";
 import WriterWorkspace from "./pages/WriterWorkspace";
 
 function SiteRoutes() {
@@ -18,6 +19,7 @@ function SiteRoutes() {
       <Route path={"/article/:slug"} component={ArticlePage} />
       <Route path={"/about"} component={EditorialPolicy} />
       <Route path={"/workspace"} component={WriterWorkspace} />
+      <Route path={"/chat"} component={StaffChat} />
       <Route path={"/admin"} component={AdminPanel} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
