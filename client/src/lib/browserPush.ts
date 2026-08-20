@@ -20,11 +20,29 @@ function serialize(subscription: PushSubscription): BrowserPushSubscription {
   return { endpoint: json.endpoint, p256dhKey: json.keys.p256dh, authKey: json.keys.auth };
 }
 
+const WORKER_READY_TIMEOUT_MS = 8_000;
+
+function waitForActiveBrowserPushWorker() {
+  return new Promise<ServiceWorkerRegistration>((resolve, reject) => {
+    const timeout = window.setTimeout(() => reject(new Error("Chronicle’s notification worker did not start within 8 seconds. Reload the page once, then try again. If it still fails, copy the technical details below and send them to the site owner.")), WORKER_READY_TIMEOUT_MS);
+    navigator.serviceWorker.ready.then(
+      (registration) => {
+        window.clearTimeout(timeout);
+        resolve(registration);
+      },
+      (error) => {
+        window.clearTimeout(timeout);
+        reject(error);
+      },
+    );
+  });
+}
+
 async function readyBrowserPushRegistration(baseUrl: string) {
   const registration = await navigator.serviceWorker.register(browserPushWorkerUrl(baseUrl), { scope: baseUrl });
   if (registration.active) return registration;
 
-  const readyRegistration = await navigator.serviceWorker.ready;
+  const readyRegistration = await waitForActiveBrowserPushWorker();
   if (!readyRegistration.active) {
     throw new Error("Chronicle’s notification worker did not finish starting. Please reload the page and try again.");
   }
