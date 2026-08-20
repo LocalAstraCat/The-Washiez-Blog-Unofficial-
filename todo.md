@@ -112,3 +112,8 @@
 - [x] Secure the push sender with a private webhook token and document that managed Database Webhooks were unavailable before using the pg_net fallback
 - [x] Replace the unavailable Database Webhooks trigger with a secured pg_net PostgreSQL trigger for queued browser-push delivery
 - [x] Add the Supabase publishable-key headers required by the Edge Function gateway to the pg_net trigger
+- [x] Research transactional-email providers and sender-verification requirements for future role-mention alerts
+- [x] Prepare a safe email-notification activation recommendation without enabling email delivery
+- [ ] Fix browser-push opt-in persistence so approved notification subscriptions and preferences are saved correctly
+- [x] Diagnose why an approved browser notification permission does not complete the Chronicle service-worker subscription write
+- [ ] Verify browser-push persistence in the owner’s real browser after the GitHub Pages worker-activation fix is deployed

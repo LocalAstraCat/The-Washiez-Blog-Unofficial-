@@ -20,9 +20,20 @@ function serialize(subscription: PushSubscription): BrowserPushSubscription {
   return { endpoint: json.endpoint, p256dhKey: json.keys.p256dh, authKey: json.keys.auth };
 }
 
+async function readyBrowserPushRegistration(baseUrl: string) {
+  const registration = await navigator.serviceWorker.register(browserPushWorkerUrl(baseUrl), { scope: baseUrl });
+  if (registration.active) return registration;
+
+  const readyRegistration = await navigator.serviceWorker.ready;
+  if (!readyRegistration.active) {
+    throw new Error("Chronicle’s notification worker did not finish starting. Please reload the page and try again.");
+  }
+  return readyRegistration;
+}
+
 export async function createBrowserPushSubscription(vapidPublicKey: string, baseUrl: string) {
   if (!browserPushSupported()) throw new Error("This browser does not support push notifications.");
-  const registration = await navigator.serviceWorker.register(browserPushWorkerUrl(baseUrl), { scope: baseUrl });
+  const registration = await readyBrowserPushRegistration(baseUrl);
   const existing = await registration.pushManager.getSubscription();
   const subscription = existing ?? await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidPublicKeyBytes(vapidPublicKey) });
   return serialize(subscription);
