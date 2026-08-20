@@ -12,6 +12,7 @@ function restoreProperty(target: object, key: string, descriptor?: PropertyDescr
 }
 
 afterEach(() => {
+  vi.useRealTimers();
   restoreProperty(navigator, "serviceWorker", originalServiceWorker);
   restoreProperty(window, "PushManager", originalPushManager);
   restoreProperty(window, "Notification", originalNotification);
@@ -43,5 +44,18 @@ describe("browser push helpers", () => {
     expect(registeringServiceWorker.pushManager.getSubscription).not.toHaveBeenCalled();
     expect(readyRegistration.pushManager.getSubscription).toHaveBeenCalledOnce();
     expect(subscribe).toHaveBeenCalledWith({ userVisibleOnly: true, applicationServerKey: new Uint8Array([1, 2, 3]) });
+  });
+
+  it("fails visibly if service-worker registration never settles instead of leaving alert setup pending", async () => {
+    vi.useFakeTimers();
+    Object.defineProperty(navigator, "serviceWorker", { configurable: true, value: { register: vi.fn().mockReturnValue(new Promise(() => {})), ready: new Promise(() => {}) } });
+    Object.defineProperty(window, "PushManager", { configurable: true, value: class PushManager {} });
+    Object.defineProperty(window, "Notification", { configurable: true, value: class Notification {} });
+
+    const subscriptionAttempt = createBrowserPushSubscription("AQID", "/The-Washiez-Blog-Unofficial-/");
+    const timeoutAssertion = expect(subscriptionAttempt).rejects.toThrow("notification worker did not start within 8 seconds");
+    await vi.advanceTimersByTimeAsync(8_000);
+
+    await timeoutAssertion;
   });
 });
